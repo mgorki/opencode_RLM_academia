@@ -1,4 +1,4 @@
-<# OpenCode RLM - SRE/DevOps Edition
+# OpenCode RLM - SRE/DevOps Edition
 
 Inspired by brainqub3 claude_code_RLM, this is an OpenCode version for RLM (Recursive Language Model)
 
@@ -19,24 +19,24 @@ This repository provides an RLM setup that enables OpenCode to process documents
 
 This implementation maps to the RLM paper architecture:
 
-| RLM Concept | Implementation | Model |
-|-------------|----------------|-------|
-| Root LLM | Main OpenCode conversation | **Claude Sonnet 4** |
-| Sub-LLM (`llm_query`) | `rlm-subcall` subagent | **Claude Haiku 4** |
+| RLM Concept | Implementation | Component |
+|-------------|----------------|-----------|
+| Root LLM | Main OpenCode conversation | Your configured model |
+| Sub-LLM (`llm_query`) | `rlm-subcall` subagent | OpenCode subagent |
 | External Environment | Persistent Python REPL (`rlm_repl.py`) | Python 3 |
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    Root LLM (Sonnet)                     │
+│                      Root LLM                            │
 │                   Main Conversation                      │
 │                  SRE/DevOps Expert                       │
 └──────────────────────┬──────────────────────────────────┘
-                       │
-         ┌─────────────┴─────────────┐
-         ▼                           ▼
+                        │
+          ┌─────────────┴─────────────┐
+          ▼                           ▼
 ┌─────────────────┐         ┌─────────────────┐
 │  Python REPL    │         │  rlm-subcall    │
-│  (Environment)  │         │  (Haiku Sub-LM) │
+│  (Environment)  │         │  (Subagent)     │
 │                 │         │                 │
 │ - Load context  │         │ - Analyze chunk │
 │ - Chunk data    │         │ - Extract info  │
@@ -45,11 +45,13 @@ This implementation maps to the RLM paper architecture:
 └─────────────────┘         └─────────────────┘
 ```
 
+**Works with any model OpenCode supports** - Tested with MiniMax M2.1 and other models.
+
 ## Prerequisites
 
 - **OpenCode** - [Install OpenCode](https://opencode.ai/docs/)
 - **Python 3** - For the persistent REPL environment
-- **API Keys** - Anthropic API key configured in OpenCode
+- **API Keys** - API keys for your configured model in OpenCode
 
 ## Quick Start
 
