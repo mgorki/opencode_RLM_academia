@@ -1,0 +1,303 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.3 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{apa/apasortcite//global/global/global}
+    \entry{bhurat2023exploration}{article}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=ccf2b4bd34ad682ff4930fb7e4a7d0b6}{%
+           family={Bhurat},
+           familyi={B\bibinitperiod},
+           given={Charu},
+           giveni={C\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e16072555d0444ff144e6e56be2fdfed}{%
+           family={Thakrar},
+           familyi={T\bibinitperiod},
+           given={Harsh},
+           giveni={H\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{a9d68fedba576c7bb906cce36c54ee17}
+      \strng{fullhash}{a9d68fedba576c7bb906cce36c54ee17}
+      \strng{fullhashraw}{a9d68fedba576c7bb906cce36c54ee17}
+      \strng{bibnamehash}{a9d68fedba576c7bb906cce36c54ee17}
+      \strng{authorbibnamehash}{a9d68fedba576c7bb906cce36c54ee17}
+      \strng{authornamehash}{a9d68fedba576c7bb906cce36c54ee17}
+      \strng{authorfullhash}{a9d68fedba576c7bb906cce36c54ee17}
+      \strng{authorfullhashraw}{a9d68fedba576c7bb906cce36c54ee17}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{The British Journal of Administrative Management}
+      \field{note}{Special Issue}
+      \field{title}{Exploration of concept of sustainability and sustainable development through its roots}
+      \field{volume}{58}
+      \field{year}{2023}
+    \endentry
+    \entry{connelly2007mapping}{article}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=7f25ea4636b932aeace4ca81ed8ea00a}{%
+           family={Connelly},
+           familyi={C\bibinitperiod},
+           given={Steve},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{7f25ea4636b932aeace4ca81ed8ea00a}
+      \strng{fullhash}{7f25ea4636b932aeace4ca81ed8ea00a}
+      \strng{fullhashraw}{7f25ea4636b932aeace4ca81ed8ea00a}
+      \strng{bibnamehash}{7f25ea4636b932aeace4ca81ed8ea00a}
+      \strng{authorbibnamehash}{7f25ea4636b932aeace4ca81ed8ea00a}
+      \strng{authornamehash}{7f25ea4636b932aeace4ca81ed8ea00a}
+      \strng{authorfullhash}{7f25ea4636b932aeace4ca81ed8ea00a}
+      \strng{authorfullhashraw}{7f25ea4636b932aeace4ca81ed8ea00a}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Local Environment}
+      \field{number}{3}
+      \field{title}{Mapping Sustainable Development as a Contested Concept}
+      \field{volume}{12}
+      \field{year}{2007}
+      \field{pages}{259\bibrangedash 278}
+      \range{pages}{20}
+      \verb{doi}
+      \verb 10.1080/13549830601183289
+      \endverb
+    \endentry
+    \entry{ruggerio2021}{article}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=319ebba2ffea50856432c2b7f655d6d9}{%
+           family={Ruggerio},
+           familyi={R\bibinitperiod},
+           given={Carlos\bibnamedelima Alberto},
+           giveni={C\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{319ebba2ffea50856432c2b7f655d6d9}
+      \strng{fullhash}{319ebba2ffea50856432c2b7f655d6d9}
+      \strng{fullhashraw}{319ebba2ffea50856432c2b7f655d6d9}
+      \strng{bibnamehash}{319ebba2ffea50856432c2b7f655d6d9}
+      \strng{authorbibnamehash}{319ebba2ffea50856432c2b7f655d6d9}
+      \strng{authornamehash}{319ebba2ffea50856432c2b7f655d6d9}
+      \strng{authorfullhash}{319ebba2ffea50856432c2b7f655d6d9}
+      \strng{authorfullhashraw}{319ebba2ffea50856432c2b7f655d6d9}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Science of the Total Environment}
+      \field{title}{Sustainability and sustainable development: A review of principles and definitions}
+      \field{volume}{786}
+      \field{year}{2021}
+      \field{pages}{147481}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1016/j.scitotenv.2021.147481
+      \endverb
+    \endentry
+    \entry{stefaska2021sustainability}{article}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=3107656e6b6bb5144b642ddce33c09b3}{%
+           family={Stefańska},
+           familyi={S\bibinitperiod},
+           given={Magdalena},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{3107656e6b6bb5144b642ddce33c09b3}
+      \strng{fullhash}{3107656e6b6bb5144b642ddce33c09b3}
+      \strng{fullhashraw}{3107656e6b6bb5144b642ddce33c09b3}
+      \strng{bibnamehash}{3107656e6b6bb5144b642ddce33c09b3}
+      \strng{authorbibnamehash}{3107656e6b6bb5144b642ddce33c09b3}
+      \strng{authornamehash}{3107656e6b6bb5144b642ddce33c09b3}
+      \strng{authorfullhash}{3107656e6b6bb5144b642ddce33c09b3}
+      \strng{authorfullhashraw}{3107656e6b6bb5144b642ddce33c09b3}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Sustainability}
+      \field{title}{Sustainability and sustainable development}
+      \field{year}{2021}
+      \field{pages}{27\bibrangedash 33}
+      \range{pages}{7}
+      \verb{doi}
+      \verb 10.18559/978-83-8211-074-6/I2
+      \endverb
+    \endentry
+  \enddatalist
+  \datalist[entry]{apa/global//global/global/global}
+    \entry{bhurat2023exploration}{article}{}{}
+      \name{author}{2}{}{%
+        {{un=0,uniquepart=base,hash=ccf2b4bd34ad682ff4930fb7e4a7d0b6}{%
+           family={Bhurat},
+           familyi={B\bibinitperiod},
+           given={Charu},
+           giveni={C\bibinitperiod},
+           givenun=0}}%
+        {{un=0,uniquepart=base,hash=e16072555d0444ff144e6e56be2fdfed}{%
+           family={Thakrar},
+           familyi={T\bibinitperiod},
+           given={Harsh},
+           giveni={H\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{a9d68fedba576c7bb906cce36c54ee17}
+      \strng{fullhash}{a9d68fedba576c7bb906cce36c54ee17}
+      \strng{fullhashraw}{a9d68fedba576c7bb906cce36c54ee17}
+      \strng{bibnamehash}{a9d68fedba576c7bb906cce36c54ee17}
+      \strng{authorbibnamehash}{a9d68fedba576c7bb906cce36c54ee17}
+      \strng{authornamehash}{a9d68fedba576c7bb906cce36c54ee17}
+      \strng{authorfullhash}{a9d68fedba576c7bb906cce36c54ee17}
+      \strng{authorfullhashraw}{a9d68fedba576c7bb906cce36c54ee17}
+      \field{sortinit}{B}
+      \field{sortinithash}{d7095fff47cda75ca2589920aae98399}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{The British Journal of Administrative Management}
+      \field{note}{Special Issue}
+      \field{title}{Exploration of concept of sustainability and sustainable development through its roots}
+      \field{volume}{58}
+      \field{year}{2023}
+    \endentry
+    \entry{connelly2007mapping}{article}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=7f25ea4636b932aeace4ca81ed8ea00a}{%
+           family={Connelly},
+           familyi={C\bibinitperiod},
+           given={Steve},
+           giveni={S\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{7f25ea4636b932aeace4ca81ed8ea00a}
+      \strng{fullhash}{7f25ea4636b932aeace4ca81ed8ea00a}
+      \strng{fullhashraw}{7f25ea4636b932aeace4ca81ed8ea00a}
+      \strng{bibnamehash}{7f25ea4636b932aeace4ca81ed8ea00a}
+      \strng{authorbibnamehash}{7f25ea4636b932aeace4ca81ed8ea00a}
+      \strng{authornamehash}{7f25ea4636b932aeace4ca81ed8ea00a}
+      \strng{authorfullhash}{7f25ea4636b932aeace4ca81ed8ea00a}
+      \strng{authorfullhashraw}{7f25ea4636b932aeace4ca81ed8ea00a}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Local Environment}
+      \field{number}{3}
+      \field{title}{Mapping Sustainable Development as a Contested Concept}
+      \field{volume}{12}
+      \field{year}{2007}
+      \field{pages}{259\bibrangedash 278}
+      \range{pages}{20}
+      \verb{doi}
+      \verb 10.1080/13549830601183289
+      \endverb
+    \endentry
+    \entry{ruggerio2021}{article}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=319ebba2ffea50856432c2b7f655d6d9}{%
+           family={Ruggerio},
+           familyi={R\bibinitperiod},
+           given={Carlos\bibnamedelima Alberto},
+           giveni={C\bibinitperiod\bibinitdelim A\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{319ebba2ffea50856432c2b7f655d6d9}
+      \strng{fullhash}{319ebba2ffea50856432c2b7f655d6d9}
+      \strng{fullhashraw}{319ebba2ffea50856432c2b7f655d6d9}
+      \strng{bibnamehash}{319ebba2ffea50856432c2b7f655d6d9}
+      \strng{authorbibnamehash}{319ebba2ffea50856432c2b7f655d6d9}
+      \strng{authornamehash}{319ebba2ffea50856432c2b7f655d6d9}
+      \strng{authorfullhash}{319ebba2ffea50856432c2b7f655d6d9}
+      \strng{authorfullhashraw}{319ebba2ffea50856432c2b7f655d6d9}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Science of the Total Environment}
+      \field{title}{Sustainability and sustainable development: A review of principles and definitions}
+      \field{volume}{786}
+      \field{year}{2021}
+      \field{pages}{147481}
+      \range{pages}{1}
+      \verb{doi}
+      \verb 10.1016/j.scitotenv.2021.147481
+      \endverb
+    \endentry
+    \entry{stefaska2021sustainability}{article}{}{}
+      \name{author}{1}{}{%
+        {{un=0,uniquepart=base,hash=3107656e6b6bb5144b642ddce33c09b3}{%
+           family={Stefańska},
+           familyi={S\bibinitperiod},
+           given={Magdalena},
+           giveni={M\bibinitperiod},
+           givenun=0}}%
+      }
+      \strng{namehash}{3107656e6b6bb5144b642ddce33c09b3}
+      \strng{fullhash}{3107656e6b6bb5144b642ddce33c09b3}
+      \strng{fullhashraw}{3107656e6b6bb5144b642ddce33c09b3}
+      \strng{bibnamehash}{3107656e6b6bb5144b642ddce33c09b3}
+      \strng{authorbibnamehash}{3107656e6b6bb5144b642ddce33c09b3}
+      \strng{authornamehash}{3107656e6b6bb5144b642ddce33c09b3}
+      \strng{authorfullhash}{3107656e6b6bb5144b642ddce33c09b3}
+      \strng{authorfullhashraw}{3107656e6b6bb5144b642ddce33c09b3}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{extradatescope}{labelyear}
+      \field{labeldatesource}{}
+      \true{uniqueprimaryauthor}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Sustainability}
+      \field{title}{Sustainability and sustainable development}
+      \field{year}{2021}
+      \field{pages}{27\bibrangedash 33}
+      \range{pages}{7}
+      \verb{doi}
+      \verb 10.18559/978-83-8211-074-6/I2
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

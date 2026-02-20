@@ -3,7 +3,7 @@
   "theme": "tokyonight",
   "autoupdate": true,
   "share": "manual",
-  "default_agent": "sre-build",
+  "default_agent": "research-write",
   "compaction": {
     "auto": true,
     "prune": true
@@ -12,7 +12,6 @@
     "ignore": [
       "node_modules/**",
       ".git/**",
-      "*.log",
       ".opencode/rlm_state/**"
     ]
   },
@@ -25,10 +24,10 @@
     }
   },
   "agent": {
-    "sre-build": {
-      "description": "Full SRE/DevOps agent with all tools enabled for infrastructure and operations work",
+    "research-write": {
+      "description": "Primary scientific research and writing agent — analyses the loaded PDF corpus and produces LaTeX/BibTeX academic writing",
       "mode": "primary",
-      "prompt": "{file:./prompts/sre-build.md}",
+      "prompt": "{file:./prompts/research-write.md}",
       "tools": {
         "write": true,
         "edit": true,
@@ -47,10 +46,10 @@
         }
       }
     },
-    "sre-plan": {
-      "description": "Analysis and planning agent for SRE tasks - read-only mode for safe investigation",
+    "research-read": {
+      "description": "Read-only literature analysis agent — safe corpus exploration, theme mapping, and gap analysis without producing drafts",
       "mode": "primary",
-      "prompt": "{file:./prompts/sre-plan.md}",
+      "prompt": "{file:./prompts/research-read.md}",
       "temperature": 0.1,
       "tools": {
         "write": false,
@@ -59,36 +58,20 @@
         "read": true,
         "grep": true,
         "glob": true,
-        "webfetch": true,
+        "webfetch": false,
         "skill": true
       },
       "permission": {
         "bash": {
           "*": "ask",
+          "python *": "allow",
           "cat *": "allow",
-          "grep *": "allow",
-          "kubectl get *": "allow",
-          "kubectl describe *": "allow",
-          "kubectl logs *": "allow",
-          "docker ps *": "allow",
-          "docker logs *": "allow",
-          "podman ps *": "allow",
-          "podman logs *": "allow",
-          "podman inspect *": "allow",
-          "podman pod ps *": "allow",
-          "podman images *": "allow",
-          "terraform plan *": "allow",
-          "terraform show *": "allow",
-          "aws * describe*": "allow",
-          "aws * list*": "allow",
-          "aws * get*": "allow",
-          "gcloud * describe *": "allow",
-          "gcloud * list *": "allow"
+          "grep *": "allow"
         }
       }
     },
     "rlm-subcall": {
-      "description": "RLM sub-LLM for chunk-level analysis. Given a chunk of context (logs, configs, manifests) and a query, extract only what is relevant and return structured results.",
+      "description": "RLM sub-LLM for chunk-level paper analysis. Given a chunk of PDF text and a query, extracts claims, evidence, and metadata, returning structured JSON. Never fabricates citations.",
       "mode": "subagent",
       "temperature": 0.1,
       "tools": {
@@ -99,168 +82,50 @@
         "webfetch": false
       }
     },
-    "log-analyzer": {
-      "description": "Specialized agent for analyzing application and system logs - identifies patterns, errors, and anomalies",
+    "paper-analyzer": {
+      "description": "Deep single-paper analysis subagent — extracts metadata, research questions, methodology, findings, and references from a given paper",
       "mode": "subagent",
-      "prompt": "{file:./prompts/log-analyzer.md}",
+      "prompt": "{file:./prompts/paper-analyzer.md}",
       "temperature": 0.1,
       "tools": {
         "read": true,
-        "grep": true,
-        "glob": true,
-        "bash": true,
         "write": false,
-        "edit": false
-      },
-      "permission": {
-        "bash": {
-          "*": "deny",
-          "grep *": "allow",
-          "cat *": "allow",
-          "head *": "allow",
-          "tail *": "allow",
-          "wc *": "allow",
-          "sort *": "allow",
-          "uniq *": "allow",
-          "awk *": "allow",
-          "sed *": "allow"
-        }
-      }
-    },
-    "k8s-expert": {
-      "description": "Kubernetes specialist for cluster operations, troubleshooting, and manifest generation",
-      "mode": "subagent",
-      "prompt": "{file:./prompts/k8s-expert.md}",
-      "tools": {
-        "read": true,
-        "write": true,
-        "edit": true,
-        "bash": true,
-        "grep": true,
-        "glob": true
-      },
-      "permission": {
-        "bash": {
-          "*": "ask",
-          "kubectl get *": "allow",
-          "kubectl describe *": "allow",
-          "kubectl logs *": "allow",
-          "kubectl explain *": "allow",
-          "kubectl api-resources *": "allow",
-          "helm list *": "allow",
-          "helm status *": "allow",
-          "helm get *": "allow"
-        }
-      }
-    },
-    "terraform-expert": {
-      "description": "Terraform/IaC specialist for infrastructure provisioning and state management",
-      "mode": "subagent",
-      "prompt": "{file:./prompts/terraform-expert.md}",
-      "tools": {
-        "read": true,
-        "write": true,
-        "edit": true,
-        "bash": true,
-        "grep": true,
-        "glob": true
-      },
-      "permission": {
-        "bash": {
-          "*": "ask",
-          "terraform plan *": "allow",
-          "terraform show *": "allow",
-          "terraform state list *": "allow",
-          "terraform state show *": "allow",
-          "terraform validate *": "allow",
-          "terraform fmt *": "allow",
-          "terraform providers *": "allow"
-        }
-      }
-    },
-    "podman-expert": {
-      "description": "Podman and container specialist for rootless containers, pod management, and systemd integration",
-      "mode": "subagent",
-      "prompt": "{file:./prompts/podman-expert.md}",
-      "tools": {
-        "read": true,
-        "write": true,
-        "edit": true,
-        "bash": true,
-        "grep": true,
-        "glob": true
-      },
-      "permission": {
-        "bash": {
-          "*": "ask",
-          "podman ps *": "allow",
-          "podman images *": "allow",
-          "podman logs *": "allow",
-          "podman inspect *": "allow",
-          "podman stats *": "allow",
-          "podman pod ps *": "allow",
-          "podman pod inspect *": "allow",
-          "podman network ls *": "allow",
-          "podman network inspect *": "allow",
-          "podman volume ls *": "allow",
-          "podman volume inspect *": "allow",
-          "podman info *": "allow",
-          "podman system df *": "allow",
-          "podman history *": "allow",
-          "systemctl --user status *": "allow",
-          "systemctl --user list-units *": "allow"
-        }
+        "edit": false,
+        "bash": false,
+        "webfetch": false
       }
     }
   },
   "command": {
     "rlm": {
-      "template": "Load the rlm skill to process a large context file. $ARGUMENTS",
-      "description": "Run RLM workflow for large context processing (logs, configs, etc.)",
-      "agent": "sre-build"
+      "description": "Run RLM workflow for large corpus analysis (load all PDFs and answer a research question)",
+      "agent": "research-write",
+      "template": "Process the scientific PDF corpus using the RLM workflow.\n\nArguments: $ARGUMENTS\n\n⚠️  YOU (the root agent) must execute all REPL steps below directly via bash.\nDo NOT spawn a generic subagent or Task for these steps — that bypasses the REPL.\nOnly delegate to @rlm-subcall when passing a chunk *file path* for content extraction.\n\nStep 1 — Load the corpus (skip if already loaded; it resumes automatically):\n```\npython .opencode/skills/rlm/scripts/rlm_repl.py load-corpus ./context/\n```\n\nStep 2 — Orient yourself:\n```\npython .opencode/skills/rlm/scripts/rlm_repl.py status\npython .opencode/skills/rlm/scripts/rlm_repl.py exec -c \"print(list_papers())\"\n```\n\nStep 3 — Find relevant papers for the query:\n```\npython .opencode/skills/rlm/scripts/rlm_repl.py exec -c \"print(find_papers('KEYWORD'))\"\npython .opencode/skills/rlm/scripts/rlm_repl.py exec -c \"print(cite('Author Year'))\"\n```\n\nStep 4 — For broad queries, use pre-written per-paper chunk files:\n  Chunks are written to .opencode/rlm_state/chunks/ during load-corpus.\n  Each file is named <bibtex_key>_chunk_NNNN.txt\n  List them: python .opencode/skills/rlm/scripts/rlm_repl.py exec -c \"import os; print(sorted(os.listdir('.opencode/rlm_state/chunks'))[:20])\"\n  Then pass each relevant chunk path + the query to @rlm-subcall.\n\nStep 5 — Synthesise subagent JSON outputs into a final answer with verified citations."
     },
-    "incident": {
-      "template": "Start incident investigation mode. Gather metrics, logs, and recent changes for: $ARGUMENTS\n\nFollow the incident response workflow:\n1. Assess severity and impact\n2. Identify affected systems\n3. Gather relevant context\n4. Propose mitigation steps",
-      "description": "Start incident investigation workflow",
-      "agent": "sre-build"
+    "research": {
+      "template": "Answer the following research question using the loaded corpus: $ARGUMENTS\n\nProcedure:\n1. Use list_papers() to confirm the corpus is loaded\n2. Use find_papers() and cite() helpers to locate relevant evidence\n3. If the corpus is large, use @rlm-subcall to extract from chunks\n4. Synthesise findings with explicit source attribution\n5. Flag any claims not supported by the corpus",
+      "description": "Research query across the loaded PDF corpus",
+      "agent": "research-write"
     },
-    "k8s-debug": {
-      "template": "Debug Kubernetes issue: $ARGUMENTS\n\nCheck:\n1. Pod status and events\n2. Container logs\n3. Resource constraints\n4. Network policies\n5. Recent deployments",
-      "description": "Debug Kubernetes cluster issues",
-      "agent": "k8s-expert",
-      "subtask": true
+    "write-section": {
+      "template": "Write a LaTeX academic section on: $ARGUMENTS\n\nRequirements:\n1. Confirm corpus is loaded; list relevant papers with list_papers()\n2. Extract key claims and quotes using cite() or @rlm-subcall\n3. Draft the section in LaTeX with \\parencite{} or \\textcite{} commands\n4. Provide matching BibTeX entries for all cited works\n5. Flag any claims that lack corpus support",
+      "description": "Draft a LaTeX section with BibTeX citations from the corpus",
+      "agent": "research-write"
     },
-    "tf-plan": {
-      "template": "Review Terraform configuration and create execution plan for: $ARGUMENTS\n\nProvide:\n1. Resource changes summary\n2. Potential risks\n3. Cost implications if applicable\n4. Recommendations",
-      "description": "Review and plan Terraform changes",
-      "agent": "terraform-expert",
-      "subtask": true
+    "cite-check": {
+      "template": "Check all citations in the following LaTeX text against the loaded corpus. For each \\cite{} or \\parencite{} or \\textcite{} key:\n1. Confirm the paper exists in the loaded corpus\n2. Verify the claim attributed to it can be found in that paper\n3. Report: VERIFIED / NOT FOUND / UNVERIFIABLE for each\n\nText to check:\n$ARGUMENTS",
+      "description": "Verify all citations exist and are accurate within the loaded corpus",
+      "agent": "research-write"
     },
-    "analyze-logs": {
-      "template": "Analyze logs from: $1\n\nLooking for: $2\n\nProvide:\n1. Error patterns and frequency\n2. Timeline of events\n3. Root cause indicators\n4. Recommended actions",
-      "description": "Analyze log files for patterns and issues",
-      "agent": "log-analyzer",
-      "subtask": true
+    "bibtex": {
+      "template": "Generate BibTeX entries for the following papers from the loaded corpus: $ARGUMENTS\n\nFor each paper:\n1. Extract metadata (authors, year, title, journal, DOI) from the corpus text\n2. Generate a BibTeX key: firstauthorlastname + year + firstmeaningfulword\n3. Output a complete BibTeX entry\n4. Note any metadata fields that could not be determined from the corpus",
+      "description": "Generate BibTeX entries from corpus paper metadata",
+      "agent": "research-write"
     },
-    "runbook": {
-      "template": "Create or update runbook for: $ARGUMENTS\n\nInclude:\n1. Overview and scope\n2. Prerequisites\n3. Step-by-step procedures\n4. Rollback steps\n5. Validation checklist\n6. Troubleshooting guide",
-      "description": "Generate operational runbook",
-      "agent": "sre-build"
-    },
-    "postmortem": {
-      "template": "Create blameless postmortem document for incident: $ARGUMENTS\n\nInclude:\n1. Incident summary\n2. Timeline of events\n3. Root cause analysis\n4. Impact assessment\n5. Action items\n6. Lessons learned",
-      "description": "Generate incident postmortem document",
-      "agent": "sre-plan"
-    },
-    "slo-review": {
-      "template": "Review SLO/SLI definitions and error budget status for: $ARGUMENTS\n\nAnalyze:\n1. Current SLO compliance\n2. Error budget consumption\n3. Trending analysis\n4. Recommendations for improvement",
-      "description": "Review SLO compliance and error budgets",
-      "agent": "sre-plan"
-    },
-    "podman-debug": {
-      "template": "Debug Podman container issue: $ARGUMENTS\n\nCheck:\n1. Container status and logs\n2. Pod configuration (if applicable)\n3. Network and volume mounts\n4. Resource constraints\n5. Rootless/systemd integration issues",
-      "description": "Debug Podman container issues",
-      "agent": "podman-expert",
+    "deep-dive": {
+      "template": "Perform a deep analysis of the paper at: $ARGUMENTS\n\nUse the @paper-analyzer subagent to extract:\n1. Full bibliographic metadata\n2. Research question and objectives\n3. Theoretical framework\n4. Methodology\n5. Key findings (with direct quotes)\n6. Limitations\n7. References mentioned\n\nThen summarise the paper's contribution and relevance.",
+      "description": "Deep single-paper analysis: metadata, methods, findings, references",
+      "agent": "research-write",
       "subtask": true
     }
   },

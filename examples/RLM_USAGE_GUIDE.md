@@ -1,449 +1,256 @@
-# RLM Usage Guide - Copy-Paste Examples
+# Scientific Research RLM Usage Guide
 
-This guide provides ready-to-use examples for the RLM (Recursive Language Model) workflow in OpenCode.
+Ready-to-use examples for the scientific literature RLM workflow in OpenCode.
 
 ---
 
-## Quick Start
+## Setup
 
-### Step 1: Generate Sample Data (Optional)
-
-If you don't have a large file to analyze, create a sample log file:
+Install the required Python dependency:
 
 ```bash
-# Generate sample application log (run in terminal first)
-python3 -c "
-import random
-import datetime
+pip install pdfplumber
+```
 
-levels = ['INFO', 'INFO', 'INFO', 'INFO', 'WARN', 'ERROR', 'DEBUG']
-services = ['api-gateway', 'user-service', 'order-service', 'payment-service', 'inventory-service']
-messages = {
-    'INFO': ['Request processed successfully', 'Connection established', 'Cache hit', 'Health check passed', 'Task completed'],
-    'WARN': ['High memory usage detected', 'Slow query detected (>1s)', 'Rate limit approaching', 'Connection pool running low', 'Retry attempt'],
-    'ERROR': ['Database connection failed', 'Timeout waiting for response', 'NullPointerException in handler', 'Authentication failed', 'Service unavailable'],
-    'DEBUG': ['Entering method processRequest', 'Variable state: active=true', 'Query execution time: 45ms', 'Cache miss for key: user_123']
+Place your PDF papers in the `context/` folder (any PDFs — any scientific field).
+
+---
+
+## Example 1: Load a Full Corpus and Ask a Research Question
+
+**In OpenCode** (with `research-write` agent):
+
+```
+/rlm corpus=./context/ query=What are the main definitions of sustainability in the literature?
+```
+
+**Or manually:**
+
+```bash
+# 1. Load all PDFs
+python .opencode/skills/rlm/scripts/rlm_repl.py load-corpus ./context/
+
+# 2. Check status
+python .opencode/skills/rlm/scripts/rlm_repl.py status
+
+# 3. List papers
+python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(list_papers())"
+```
+
+Then in OpenCode:
+> "Using the loaded corpus, what are the main definitions of sustainability?"
+
+---
+
+## Example 2: Write a Literature Review Section in LaTeX
+
+```
+/write-section the concept of planetary boundaries and Earth-system tipping points
+```
+
+Expected output:
+```latex
+\section{Planetary Boundaries}
+
+The planetary boundaries framework, introduced by \textcite{rockstrom2009safe},
+proposes a set of nine Earth-system processes within which humanity can safely
+operate. \parencite{rockstrom2009planetary} define these boundaries as...
+
+\printbibliography
+```
+
+```bibtex
+@article{rockstrom2009safe,
+  author  = {Rockström, Johan and Steffen, Will and ...},
+  year    = {2009},
+  title   = {A safe operating space for humanity},
+  journal = {Nature},
+  volume  = {461},
+  pages   = {472--475},
+  doi     = {10.1038/461472a},
 }
+```
 
-base_time = datetime.datetime.now() - datetime.timedelta(hours=2)
-with open('context/sample_app.log', 'w') as f:
-    for i in range(5000):
-        ts = base_time + datetime.timedelta(seconds=i*1.5)
-        level = random.choice(levels)
-        service = random.choice(services)
-        msg = random.choice(messages[level])
-        if level == 'ERROR' and random.random() > 0.7:
-            f.write(f'{ts.isoformat()} [{level}] [{service}] {msg}\n')
-            f.write(f'    at com.example.{service.replace(\"-\", \".\")}.Handler.process(Handler.java:{random.randint(50,200)})\n')
-            f.write(f'    at com.example.{service.replace(\"-\", \".\")}.Service.execute(Service.java:{random.randint(100,300)})\n')
-        else:
-            f.write(f'{ts.isoformat()} [{level}] [{service}] {msg}\n')
-print('Created context/sample_app.log with 5000+ log entries')
+---
+
+## Example 3: Find Papers on a Specific Topic
+
+```bash
+python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "
+import json
+results = find_papers('consensus')
+print(json.dumps(results, indent=2))
 "
 ```
 
 ---
 
-## Example 1: Basic RLM Workflow
-
-Copy and paste this entire block into OpenCode:
-
-```
-/rlm context=context/sample_app.log query="Find all ERROR level logs, identify the most common error patterns, and determine which service has the most errors"
-```
-
----
-
-## Example 2: Step-by-Step Manual RLM
-
-If you prefer to run the RLM workflow manually, follow these steps:
-
-### Step 2a: Initialize the REPL
-
-```
-Initialize the RLM REPL with my log file:
-
-python3 .opencode/skills/rlm/scripts/rlm_repl.py init context/sample_app.log
-python3 .opencode/skills/rlm/scripts/rlm_repl.py status
-```
-
-### Step 2b: Scout the Content
-
-```
-Show me the first 2000 characters of the log file to understand its format:
-
-python3 .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(peek(0, 2000))"
-```
-
-### Step 2c: Get Statistics
-
-```
-Get statistics about the log file:
-
-python3 .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(stats())"
-```
-
-### Step 2d: Search for Errors
-
-```
-Find all ERROR level log entries:
-
-python3 .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(grep(r'\[ERROR\]', max_matches=30))"
-```
-
-### Step 2e: Create Chunks (for very large files)
-
-```
-Split the log file into chunks for detailed analysis:
-
-python3 .opencode/skills/rlm/scripts/rlm_repl.py exec -c "paths = write_chunks('.opencode/rlm_state/chunks', size=100000); print(f'Created {len(paths)} chunks'); print(paths)"
-```
-
-### Step 2f: Analyze a Chunk with Subagent
-
-```
-@rlm-subcall Please analyze the chunk at .opencode/rlm_state/chunks/chunk_0000.txt
-
-Query: Find all errors, identify patterns, and note any stack traces. Return structured JSON with your findings.
-```
-
-### Step 2g: Clean Up
-
-```
-Clean up the RLM state when done:
-
-python3 .opencode/skills/rlm/scripts/rlm_repl.py reset
-```
-
----
-
-## Example 3: Kubernetes Manifest Analysis
-
-### Generate Sample K8s Manifests
+## Example 4: Retrieve Passages About a Specific Citation
 
 ```bash
-# Run in terminal to create sample manifests
-cat > context/k8s-manifests.yaml << 'EOF'
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: api-gateway
-  namespace: production
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: api-gateway
-  template:
-    metadata:
-      labels:
-        app: api-gateway
-    spec:
-      containers:
-      - name: api-gateway
-        image: myregistry/api-gateway:v1.2.3
-        ports:
-        - containerPort: 8080
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8080
-          initialDelaySeconds: 30
-          periodSeconds: 10
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: user-service
-  namespace: production
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: user-service
-  template:
-    metadata:
-      labels:
-        app: user-service
-    spec:
-      containers:
-      - name: user-service
-        image: myregistry/user-service:v2.0.0
-        ports:
-        - containerPort: 8081
-        env:
-        - name: DB_PASSWORD
-          value: "hardcoded-password-bad-practice"
-        resources:
-          requests:
-            memory: "128Mi"
-            cpu: "100m"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: api-gateway
-  namespace: production
-spec:
-  selector:
-    app: api-gateway
-  ports:
-  - port: 80
-    targetPort: 8080
-  type: LoadBalancer
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: app-config
-  namespace: production
-data:
-  LOG_LEVEL: "DEBUG"
-  API_TIMEOUT: "30s"
-  ENABLE_TRACING: "true"
-EOF
-echo "Created context/k8s-manifests.yaml"
-```
-
-### Analyze K8s Manifests with RLM
-
-```
-/rlm context=context/k8s-manifests.yaml query="Review these Kubernetes manifests for security issues, missing best practices, and potential problems. Check for: hardcoded secrets, missing resource limits, missing probes, and security contexts."
+python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "
+results = cite('Brundtland 1987')
+for r in results[:3]:
+    print('---')
+    print(r['context'][:400])
+"
 ```
 
 ---
 
-## Example 4: Terraform State Analysis
-
-### Generate Sample Terraform Output
+## Example 5: Search for Evidence Supporting a Claim
 
 ```bash
-# Run in terminal to create sample terraform plan output
-cat > context/terraform-plan.json << 'EOF'
+python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "
+results = search_claim('scientific consensus on climate change exceeds 97 percent')
+for r in results[:3]:
+    print('---')
+    print(r['context'][:400])
+"
+```
+
+---
+
+## Example 6: Deep-Dive on a Single Paper
+
+```
+/deep-dive ./context/Rockström et al. - 2009 - A safe operating space for humanity.pdf
+```
+
+Or load it directly:
+
+```bash
+python .opencode/skills/rlm/scripts/rlm_repl.py pdf "./context/Rockström et al. - 2009 - A safe operating space for humanity.pdf"
+python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(peek(0, 3000))"
+python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(stats())"
+```
+
+---
+
+## Example 7: Generate BibTeX for Cited Papers
+
+```
+/bibtex Cook et al. 2013, Rockström et al. 2009, Brundtland 1987
+```
+
+Or use the REPL to extract reference lists:
+
+```bash
+python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "
+refs = extract_references(paper_index=0)  # from first paper
+for r in refs[:10]:
+    print(r)
+"
+```
+
+---
+
+## Example 8: Check Citations for Hallucinations
+
+After writing a section, verify every citation:
+
+```
+/cite-check \parencite{cook2013quantifying} found that 97\% of climate scientists...
+\textcite{rockstrom2009safe} proposed nine planetary boundaries...
+\parencite{brundtland1987our} defined sustainable development as...
+```
+
+The agent will check each key against the loaded corpus and report:
+- `VERIFIED` — paper found and claim traceable
+- `NOT FOUND` — paper not in corpus
+- `UNVERIFIABLE` — paper found but claim cannot be located
+
+---
+
+## Example 9: Large Corpus — Chunk and Delegate
+
+For corpora too large for direct analysis:
+
+```bash
+# Create chunks
+python .opencode/skills/rlm/scripts/rlm_repl.py exec <<'PY'
+paths = write_chunks('.opencode/rlm_state/chunks', size=150000, overlap=2000)
+print(f"Created {len(paths)} chunks")
+for p in paths[:5]:
+    print(p)
+PY
+```
+
+Then in OpenCode, invoke `@rlm-subcall` for each chunk:
+> "@rlm-subcall: Read .opencode/rlm_state/chunks/chunk_0000.txt and extract all definitions of sustainability with direct quotes and author attributions."
+
+Collect results and synthesise:
+
+```bash
+python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "
+add_buffer('''
 {
-  "format_version": "1.0",
-  "terraform_version": "1.5.0",
-  "planned_values": {
-    "root_module": {
-      "resources": [
-        {
-          "address": "aws_instance.web_server",
-          "mode": "managed",
-          "type": "aws_instance",
-          "name": "web_server",
-          "provider_name": "registry.terraform.io/hashicorp/aws",
-          "schema_version": 1,
-          "values": {
-            "ami": "ami-0c55b159cbfafe1f0",
-            "instance_type": "t3.medium",
-            "tags": {
-              "Name": "web-server-prod",
-              "Environment": "production"
-            },
-            "vpc_security_group_ids": ["sg-12345678"]
-          }
-        },
-        {
-          "address": "aws_security_group.allow_all",
-          "mode": "managed",
-          "type": "aws_security_group",
-          "name": "allow_all",
-          "provider_name": "registry.terraform.io/hashicorp/aws",
-          "values": {
-            "name": "allow-all-traffic",
-            "description": "Allow all inbound traffic",
-            "ingress": [
-              {
-                "from_port": 0,
-                "to_port": 65535,
-                "protocol": "tcp",
-                "cidr_blocks": ["0.0.0.0/0"]
-              }
-            ],
-            "egress": [
-              {
-                "from_port": 0,
-                "to_port": 0,
-                "protocol": "-1",
-                "cidr_blocks": ["0.0.0.0/0"]
-              }
-            ]
-          }
-        },
-        {
-          "address": "aws_s3_bucket.data",
-          "mode": "managed",
-          "type": "aws_s3_bucket",
-          "name": "data",
-          "values": {
-            "bucket": "my-company-data-bucket",
-            "acl": "public-read"
-          }
-        },
-        {
-          "address": "aws_rds_instance.database",
-          "mode": "managed",
-          "type": "aws_db_instance",
-          "name": "database",
-          "values": {
-            "allocated_storage": 100,
-            "engine": "mysql",
-            "engine_version": "8.0",
-            "instance_class": "db.t3.large",
-            "publicly_accessible": true,
-            "skip_final_snapshot": true,
-            "backup_retention_period": 0
-          }
-        }
-      ]
-    }
-  },
-  "resource_changes": [
-    {
-      "address": "aws_instance.web_server",
-      "change": {
-        "actions": ["create"]
-      }
-    },
-    {
-      "address": "aws_security_group.allow_all",
-      "change": {
-        "actions": ["create"]
-      }
-    },
-    {
-      "address": "aws_s3_bucket.data",
-      "change": {
-        "actions": ["create"]
-      }
-    },
-    {
-      "address": "aws_rds_instance.database",
-      "change": {
-        "actions": ["create"]
-      }
-    }
-  ]
+  \"chunk\": 0,
+  \"findings\": [...]
 }
-EOF
-echo "Created context/terraform-plan.json"
-```
-
-### Analyze Terraform Plan
-
-```
-/rlm context=context/terraform-plan.json query="Review this Terraform plan for security issues and AWS best practices. Check for: overly permissive security groups, public S3 buckets, publicly accessible databases, missing encryption, and backup configurations."
+''')
+"
 ```
 
 ---
 
-## Example 5: Using Specialized Agents
+## Example 10: Export Synthesis Buffers
 
-### Kubernetes Debugging
+After collecting chunk analysis results:
 
-```
-@k8s-expert My pods are in CrashLoopBackOff state. Help me debug:
-
-kubectl get pods -n production
-kubectl describe pod api-gateway-xxx -n production
-kubectl logs api-gateway-xxx -n production --previous
+```bash
+python .opencode/skills/rlm/scripts/rlm_repl.py export-buffers .opencode/rlm_state/synthesis.txt
 ```
 
-### Terraform Review
+Then ask the agent to synthesise from the file:
+> "Read .opencode/rlm_state/synthesis.txt and write a 500-word literature review on definitions of sustainability in LaTeX with BibTeX."
 
-```
-@terraform-expert Review my Terraform configuration for the VPC module. Check for security best practices and suggest improvements.
-```
+---
 
-### Log Analysis
+## REPL Quick Reference
 
-```
-@log-analyzer Analyze the application logs in context/sample_app.log. Find error patterns, identify the timeline of issues, and suggest root causes.
-```
+```bash
+# Load corpus
+python .opencode/skills/rlm/scripts/rlm_repl.py load-corpus ./context/
+python .opencode/skills/rlm/scripts/rlm_repl.py pdf ./context/paper.pdf
 
-### Podman Debugging
+# Status
+python .opencode/skills/rlm/scripts/rlm_repl.py status
 
-```
-@podman-expert My container keeps restarting. Help me debug:
+# Helpers
+python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(list_papers())"
+python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(stats())"
+python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(find_papers('keyword'))"
+python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(cite('Author Year'))"
+python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(search_claim('your claim here'))"
+python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(get_paper(0))"
+python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(extract_references(0))"
 
-podman ps -a
-podman logs mycontainer
-podman inspect mycontainer
+# Chunking
+python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "paths = write_chunks('.opencode/rlm_state/chunks'); print(len(paths), 'chunks')"
+
+# Cleanup
+python .opencode/skills/rlm/scripts/rlm_repl.py reset
 ```
 
 ---
 
-## Example 6: Incident Response Workflow
+## Agent Quick Reference
 
-```
-/incident Production API returning 503 errors
+| Agent | Use for |
+|-------|---------|
+| `research-write` | Writing, synthesis, LaTeX output, citation generation |
+| `research-read` | Safe exploration, theme mapping, gap analysis (read-only) |
+| `@rlm-subcall` | Chunk-level extraction — called by root LLM in RLM loops |
+| `@paper-analyzer` | Deep single-paper analysis |
 
-Recent observations:
-- Started approximately 15 minutes ago
-- Affecting /api/v1/users endpoint
-- Error rate jumped from 0.1% to 15%
-- No recent deployments in the last 2 hours
-```
+## Command Quick Reference
 
----
-
-## Example 7: Generate Runbook
-
-```
-/runbook Database failover procedure
-
-Context:
-- Primary database: PostgreSQL on AWS RDS
-- Replica in different AZ
-- Applications connect via connection pooler (PgBouncer)
-```
-
----
-
-## Example 8: Create Postmortem
-
-```
-/postmortem 2024-01-15 API Gateway Outage
-
-Details:
-- Duration: 45 minutes
-- Impact: 30% of API requests failed
-- Root cause: Memory leak in new release
-- Resolution: Rollback to previous version
-```
-
----
-
-## REPL Helper Functions Reference
-
-| Function | Description | Example |
-|----------|-------------|---------|
-| `peek(start, end)` | View slice of content | `peek(0, 1000)` |
-| `grep(pattern, max_matches)` | Search with regex | `grep(r'ERROR', 20)` |
-| `grep_count(pattern)` | Count occurrences | `grep_count(r'ERROR')` |
-| `find_lines(pattern)` | Find lines with numbers | `find_lines(r'Exception')` |
-| `stats()` | Content statistics | `stats()` |
-| `time_range()` | Extract time range | `time_range()` |
-| `chunk_indices(size, overlap)` | Get chunk boundaries | `chunk_indices(100000, 1000)` |
-| `write_chunks(dir, size)` | Write chunks to files | `write_chunks('.opencode/rlm_state/chunks', 100000)` |
-| `add_buffer(text)` | Store intermediate results | `add_buffer('finding 1')` |
-| `extract_json_objects()` | Parse JSONL content | `extract_json_objects()` |
-| `extract_yaml_documents()` | Split YAML docs | `extract_yaml_documents()` |
-
----
-
-## Tips
-
-1. **Start with stats()**: Always check `stats()` first to understand your file size and content
-2. **Scout before chunking**: Use `peek()` to understand the format before deciding chunk size
-3. **Use grep for targeting**: Find specific patterns before doing full analysis
-4. **Clean up after**: Run `reset` to clean up chunk files when done
-5. **Use appropriate agents**: `@log-analyzer` for logs, `@k8s-expert` for K8s, etc.
+| Command | Purpose |
+|---------|---------|
+| `/rlm` | Load PDF corpus and run RLM workflow |
+| `/research` | Answer a research question from corpus |
+| `/write-section` | Draft a LaTeX section with BibTeX |
+| `/cite-check` | Verify citations against loaded corpus |
+| `/bibtex` | Generate BibTeX entries from corpus metadata |
+| `/deep-dive` | Full analysis of a single paper |

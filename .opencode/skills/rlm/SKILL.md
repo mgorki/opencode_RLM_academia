@@ -1,127 +1,143 @@
 ---
 name: rlm
-description: Run a Recursive Language Model-style loop for long-context tasks (logs, configs, manifests). Uses a persistent Python REPL and rlm-subcall subagent for chunk-level analysis.
+description: Run a Recursive Language Model-style loop for scientific literature analysis. Loads a corpus of PDF papers into the persistent Python REPL, chunks the content, and uses the rlm-subcall subagent for paper-by-paper extraction and synthesis.
 ---
 
-# rlm (Recursive Language Model workflow)
+# rlm (Scientific Literature RLM Workflow)
 
 Use this Skill when:
-- The user provides (or references) a very large context file (logs, configs, Kubernetes manifests, Terraform state, etc.) that won't fit comfortably in chat context.
-- You need to iteratively inspect, search, chunk, and extract information from that context.
-- You need to delegate chunk-level analysis to a subagent for efficient processing.
+- The user provides a folder of scientific PDF papers to analyse
+- You need to answer a research question across a large corpus
+- The combined text of the papers exceeds the LLM context window
+- You need to extract evidence, citations, or findings systematically
 
 ## Mental Model
 
-- Main OpenCode conversation = the root LM (orchestrator)
-- Persistent Python REPL (`rlm_repl.py`) = the external environment for state management
-- Subagent `rlm-subcall` = the sub-LM used for chunk analysis (like `llm_query` in RLM paper)
-
-## Architecture
+- Main OpenCode conversation = the root LM (orchestrator + synthesiser)
+- Persistent Python REPL (`rlm_repl.py`) = environment for PDF extraction, state, and corpus management
+- Subagent `rlm-subcall` = the sub-LM used for chunk-by-chunk analysis
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    Root LLM (Sonnet)                     │
-│                   Main Conversation                      │
+│                 Root LLM (research-write)                │
+│             Orchestration & Synthesis                    │
 └──────────────────────┬──────────────────────────────────┘
                        │
          ┌─────────────┴─────────────┐
          ▼                           ▼
 ┌─────────────────┐         ┌─────────────────┐
 │  Python REPL    │         │  rlm-subcall    │
-│  (Environment)  │         │  (Haiku Sub-LM) │
+│  (Environment)  │         │  (Sub-LM)       │
 │                 │         │                 │
-│ - Load context  │         │ - Analyze chunk │
-│ - Chunk data    │         │ - Extract info  │
+│ - Extract PDFs  │         │ - Analyse chunk │
+│ - Manage corpus │         │ - Extract claims│
 │ - Store results │         │ - Return JSON   │
 └─────────────────┘         └─────────────────┘
 ```
 
-## How to Run
+## Inputs
 
-### Inputs
+This Skill accepts:
+- `corpus=<path>` — path to a directory of PDFs (e.g. `corpus=./context/`)
+- `paper=<path>` — path to a single PDF for deep-dive mode
+- `query=<question>` — what the user wants to know
+- Optional: `chunk_chars=<int>` (default 150000), `overlap_chars=<int>` (default 2000)
 
-This Skill accepts these patterns:
-- `context=<path>` (required): path to the file containing the large context
-- `query=<question>` (required): what the user wants to know
-- Optional: `chunk_chars=<int>` (default ~200000) and `overlap_chars=<int>` (default 0)
+If arguments were not supplied, ask for:
+1. The corpus directory or single paper path
+2. The research question or analysis goal
 
-If arguments weren't supplied, ask for:
-1. The context file path
-2. The query/question
+## Step-by-Step Procedure
 
-### Step-by-step Procedure
+> ⚠️ **Critical: YOU (the root agent) run all bash/REPL steps directly.**
+> Do NOT spawn a generic `Task` or subagent to run the `/rlm` command or REPL commands —
+> that bypasses the REPL entirely and produces answers from the LLM's own knowledge, not the corpus.
+> Only delegate to `@rlm-subcall` when you have a specific *chunk file path* to pass for content extraction.
 
-1. **Initialize the REPL state**
+### Mode A: Full Corpus (multiple PDFs)
+
+1. **Load the corpus into the REPL**
+   (Automatically resumes if interrupted — just re-run the same command)
    ```bash
-   python3 .opencode/skills/rlm/scripts/rlm_repl.py init <context_path>
-   python3 .opencode/skills/rlm/scripts/rlm_repl.py status
+   python .opencode/skills/rlm/scripts/rlm_repl.py load-corpus ./context/
+   python .opencode/skills/rlm/scripts/rlm_repl.py status
+   ```
+   Per-paper chunk files are written to `.opencode/rlm_state/chunks/` automatically during this step.
+   Each file is named `<bibtex_key>_chunk_NNNN.txt` (overlapping, 150 000 chars max by default).
+
+2. **Orient yourself**
+   ```bash
+   python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(list_papers())"
+   python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(stats())"
    ```
 
-2. **Scout the context quickly**
+3. **Find relevant papers**
    ```bash
-   # Preview beginning
-   python3 .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(peek(0, 3000))"
-   
-   # Preview end
-   python3 .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(peek(len(content)-3000, len(content)))"
+   python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(find_papers('climate'))"
+   python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(cite('Rockström 2009'))"
    ```
 
-3. **Choose a chunking strategy**
-   - For logs: chunk by time windows or size
-   - For Kubernetes manifests: chunk by resource
-   - For Terraform: chunk by module/resource type
-   - For JSON/YAML configs: chunk by top-level keys
-   - Default: chunk by characters (size around chunk_chars)
+4. **For broad queries — use pre-written chunk files and delegate to @rlm-subcall**
 
-4. **Materialize chunks as files** (so subagents can read them)
+   Chunk files are already in `.opencode/rlm_state/chunks/` from step 1.
+   List available chunks:
    ```bash
-   python3 .opencode/skills/rlm/scripts/rlm_repl.py exec <<'PY'
-   paths = write_chunks('.opencode/rlm_state/chunks', size=200000, overlap=0)
-   print(f"Created {len(paths)} chunks")
-   print(paths[:5])
-   PY
+   python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "import os; print(sorted(os.listdir('.opencode/rlm_state/chunks'))[:20])"
+   ```
+   For each relevant chunk file, invoke `@rlm-subcall` with the file path + query.
+   (You can filter to only chunks whose `bibtex_key` prefix matches papers found in step 3.)
+
+   If chunks are missing (e.g. after a `reset`), regenerate them:
+   ```bash
+   python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "paths = write_chunks('.opencode/rlm_state/chunks'); print(len(paths), 'chunks')"
    ```
 
-5. **Subcall loop** (delegate to rlm-subcall)
-   - For each chunk file, invoke the `@rlm-subcall` subagent with:
-     - The user query
-     - The chunk file path
-     - Any specific extraction instructions
-   - Keep subagent outputs compact and structured (JSON preferred)
-   - Store results using the REPL's `add_buffer()` function
+5. **Store intermediate results**
+   ```bash
+   python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "add_buffer(json_result)"
+   ```
 
-6. **Synthesis**
-   - Once enough evidence is collected, synthesize the final answer
-   - Cite specific evidence (line numbers, timestamps, resource names)
-   - Provide actionable recommendations
+6. **Synthesise**
+   Collect subagent JSON outputs and synthesise:
+   - Group findings by theme
+   - Identify consensus and disagreement
+   - Draft LaTeX section with verified citations
+   - Generate BibTeX entries from paper metadata
 
-## SRE/DevOps Context-Specific Tips
+### Mode B: Single Paper Deep-Dive
 
-### For Log Analysis
+1. **Load the paper**
+   ```bash
+   python .opencode/skills/rlm/scripts/rlm_repl.py pdf ./context/paper.pdf
+   python .opencode/skills/rlm/scripts/rlm_repl.py status
+   ```
+
+2. **Inspect the paper**
+   ```bash
+   python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(peek(0, 3000))"
+   python .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(stats())"
+   ```
+
+3. **Use @paper-analyzer for structured extraction**
+   Invoke `@paper-analyzer` with the extracted text or file path.
+
+## Research-Specific REPL Helpers
+
 ```python
-# Find error patterns first
-python3 .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(grep(r'(ERROR|FATAL|Exception)', max_matches=50))"
-
-# Check for specific service issues
-python3 .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(grep(r'service_name.*failed', max_matches=20))"
-```
-
-### For Kubernetes Manifests
-```python
-# Find all resource types
-python3 .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(grep(r'^kind:\s*\w+', max_matches=100))"
-```
-
-### For Terraform State
-```python
-# Find resources by type
-python3 .opencode/skills/rlm/scripts/rlm_repl.py exec -c "print(grep(r'\"type\":\s*\"aws_', max_matches=50))"
+list_papers()              # List all loaded papers with indices
+find_papers('keyword')     # Search by author/title keyword
+cite('Smith 2020')         # Get passages mentioning a specific reference
+search_claim('X causes Y') # Find evidence for/against a claim
+extract_references()       # Parse reference lists from papers
+get_paper(0)               # Get full text of paper at index 0
+stats()                    # Corpus overview: papers, chars, top terms
 ```
 
 ## Guardrails
 
-- Do not paste large raw chunks into the main chat context
-- Use the REPL to locate exact excerpts; quote only what you need
-- Subagents cannot spawn other subagents; orchestration stays in root
-- Keep scratch/state files under `.opencode/rlm_state/`
-- Clean up chunk files after analysis is complete
+- Do NOT paste large raw chunks into the main chat
+- Use the REPL to locate exact passages; quote only what you need
+- Subagents cannot spawn other subagents
+- NEVER fabricate citations — only report what the REPL returns
+- Keep scratch files under `.opencode/rlm_state/`
+- Clean up chunk files after analysis: `python rlm_repl.py reset`
