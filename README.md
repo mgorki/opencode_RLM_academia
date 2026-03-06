@@ -72,6 +72,7 @@ pip install -r requirements.txt
 
 3. **Load your corpus and run the RLM workflow**
    ```
+   (You may or may not have to run /init first)
    /rlm corpus=./context/ query="What definitions of sustainability appear across these papers?"
    ```
 
